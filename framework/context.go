@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type Context struct {
@@ -21,12 +22,31 @@ func NewContext(r *http.Request, w http.ResponseWriter) *Context {
 	}
 }
 
+// base
+
+// context
+
 func (ctx *Context) BaseContext() context.Context {
 	return ctx.request.Context()
 }
 
+func (ctx *Context) Deadline() (deadline time.Time, ok bool) {
+	// todo
+	return time.Time{}, false
+}
+
+func (ctx *Context) Err() error {
+	// todo
+	return nil
+}
+
 func (ctx *Context) Done() <-chan struct{} {
 	return ctx.BaseContext().Done()
+}
+
+func (ctx *Context) Value(key interface{}) interface{} {
+	// todo
+	return nil
 }
 
 // request

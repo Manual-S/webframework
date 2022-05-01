@@ -7,13 +7,15 @@ type Core struct {
 }
 
 func NewCore() *Core {
-	return &Core{}
+	return &Core{
+		router: map[string]ControllerHandler{},
+	}
 }
 
 func (c *Core) ServeHTTP(response http.ResponseWriter, request *http.Request) {
 	ctx := NewContext(request, response)
+	// 路由选择
 	router := c.router["foo"]
-
 	// 强制类型转换
 	router(ctx)
 }
