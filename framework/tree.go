@@ -76,6 +76,12 @@ func (n *node) matchNode(uri string) *node {
 
 	if len(segments) == 1 {
 		// 说明uri segment已经是最后一个节点
+		for _, tn := range cnodes {
+			if tn.isLast {
+				return tn
+			}
+		}
+		return nil
 	}
 
 	// 如果有2个segment 递归每个子节点继续进行查找
