@@ -9,6 +9,13 @@ type Tree struct {
 	root *node
 }
 
+func NewTree() *Tree {
+	root := newNode()
+	return &Tree{
+		root: root,
+	}
+}
+
 type node struct {
 	isLast  bool
 	segment string
@@ -17,7 +24,11 @@ type node struct {
 }
 
 func newNode() *node {
-	return nil
+	return &node{
+		isLast:  false,
+		segment: "",
+		childs:  []*node{},
+	}
 }
 
 // isWildSegment 判断一个segment是否是通配segment 以:开头的就是通配segment
@@ -124,4 +135,14 @@ func (tree *Tree) AddRouter(uri string, handler ControllerHandler) error {
 	}
 
 	return nil
+}
+
+// FindHandler 匹配uri
+func (tree *Tree) FindHandler(uri string) ControllerHandler {
+
+	matchNode := tree.root.matchNode(uri)
+	if matchNode == nil {
+		return nil
+	}
+	return matchNode.handler
 }

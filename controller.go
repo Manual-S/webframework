@@ -46,3 +46,8 @@ func FooControllerHandler(c *framework.Context) error {
 
 	return nil
 }
+
+func UserLoginController(c *framework.Context) error {
+	c.Json(http.StatusOK, "UserLoginController")
+	return nil
+}
