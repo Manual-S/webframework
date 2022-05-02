@@ -21,6 +21,8 @@ func NewCore() *Core {
 	}
 }
 
+// ServeHTTP 实现ServeHTTP接口 就可以将所有的http请求转向我们自己的处理逻辑
+// 在ServeHTTP中 可以自由定义路由映射规则
 func (c *Core) ServeHTTP(response http.ResponseWriter, request *http.Request) {
 	ctx := NewContext(request, response)
 
