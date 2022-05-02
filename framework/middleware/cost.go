@@ -16,7 +16,7 @@ func Cost() framework.ControllerHandler {
 		end := time.Now()
 		cost := end.Sub(start)
 
-		log.Println("api uri :%v cost :v", c.GetRequest().URL, cost.Seconds())
+		log.Printf("api uri :%v cost :%v", c.GetRequest().URL, cost.Microseconds())
 		return nil
 	}
 }

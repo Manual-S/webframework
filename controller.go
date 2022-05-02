@@ -50,5 +50,6 @@ func FooControllerHandler(c *framework.Context) error {
 
 func UserLoginController(c *framework.Context) error {
 	c.Json(http.StatusOK, "UserLoginController")
+	time.Sleep(1 * time.Microsecond)
 	return nil
 }

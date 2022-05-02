@@ -1,10 +1,13 @@
 // 路由层
 package main
 
-import "webframework/framework"
+import (
+	"webframework/framework"
+	"webframework/framework/middleware"
+)
 
 func registerRouter(core *framework.Core) {
-	core.Use()
+	core.Use(middleware.Cost())
 	core.Get("/user/login", UserLoginController)
 	//subjectApi := core.Group("/subject")
 	//{
