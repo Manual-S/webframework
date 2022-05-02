@@ -3,12 +3,12 @@ package main
 
 import (
 	"webframework/framework"
-	"webframework/framework/middleware"
 )
 
 func registerRouter(core *framework.Core) {
-	core.Use(middleware.Cost())
+	//core.Use(middleware.Cost())
 	core.Get("/user/login", UserLoginController)
+	core.Get("/foo", FooControllerHandler)
 	//subjectApi := core.Group("/subject")
 	//{
 	//	// 需求4:动态路由

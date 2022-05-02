@@ -37,12 +37,17 @@ func FooControllerHandler(c *framework.Context) error {
 	select {
 	case p := <-panicChan:
 		// 发生了异常
+		c.WriteMux().Lock()
+		defer c.WriteMux().Unlock()
 		log.Println(p)
 		c.Json(http.StatusInternalServerError, "panic")
 	case <-finish:
 		fmt.Println("finish")
 	case <-durationCtx.Done():
+		c.WriteMux().Lock()
+		defer c.WriteMux().Unlock()
 		c.Json(http.StatusInternalServerError, "time out")
+		c.SetHasTimeout()
 	}
 
 	return nil

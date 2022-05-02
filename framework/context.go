@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/spf13/cast"
@@ -12,7 +13,9 @@ import (
 type Context struct {
 	request        *http.Request
 	responseWriter http.ResponseWriter
+	writeMux       *sync.Mutex
 	ctx            context.Context
+	hasTimeout     bool
 	handlers       []ControllerHandler
 	index          int // 当前请求调用到调用链的那个节点
 }
@@ -23,10 +26,31 @@ func NewContext(r *http.Request, w http.ResponseWriter) *Context {
 		responseWriter: w,
 		ctx:            r.Context(),
 		index:          -1,
+		writeMux:       &sync.Mutex{},
 	}
 }
 
 // base
+
+func (ctx *Context) WriteMux() *sync.Mutex {
+	return ctx.writeMux
+}
+
+func (ctx *Context) GetRequest() *http.Request {
+	return ctx.request
+}
+
+func (ctx *Context) GetResponse() http.ResponseWriter {
+	return ctx.responseWriter
+}
+
+func (ctx *Context) SetHasTimeout() {
+	ctx.hasTimeout = true
+}
+
+func (ctx *Context) HasTimeout() bool {
+	return ctx.hasTimeout
+}
 
 // context
 
@@ -55,10 +79,6 @@ func (ctx *Context) Value(key interface{}) interface{} {
 
 // request
 
-func (ctx *Context) GetRequest() *http.Request {
-	return ctx.request
-}
-
 func (ctx *Context) QueryInt(key string, def int) (int, bool) {
 	hash := ctx.QueryAll()
 	vals, ok := hash[key]
@@ -82,6 +102,11 @@ func (ctx *Context) QueryString(key string, def string) (string, bool) {
 	return def, false
 }
 
+func (ctx *Context) QueryArray(key string, def string) []string {
+	// todo
+	return nil
+}
+
 func (ctx *Context) QueryAll() map[string][]string {
 	if ctx.request != nil {
 		// 强制类型转换
@@ -91,9 +116,36 @@ func (ctx *Context) QueryAll() map[string][]string {
 	return map[string][]string{}
 }
 
+func (ctx *Context) Formint(key string, def int) int {
+	// todo
+	return 0
+}
+
+func (ctx *Context) FormString(key string, def string) string {
+	// todo
+	return ""
+}
+
+func (ctx *Context) FormArray(key string, def []string) []string {
+	// todo
+	return nil
+}
+
+func (ctx *Context) FormAll() map[string][]string {
+	// todo
+	return nil
+}
+func (ctx *Context) BindJson(obj interface{}) error {
+	// todo
+	return nil
+}
+
 // response
 
 func (ctx *Context) Json(status int, data interface{}) error {
+	if ctx.HasTimeout() {
+		return nil
+	}
 	ctx.responseWriter.Header().Set("Content-Type", "application/json")
 	ctx.responseWriter.WriteHeader(status)
 	byt, err := json.Marshal(data)

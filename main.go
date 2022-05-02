@@ -12,6 +12,5 @@ func main() {
 		Handler: core,
 		Addr:    ":8080",
 	}
-
 	server.ListenAndServe()
 }
