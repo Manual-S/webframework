@@ -4,8 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"strconv"
 	"time"
+
+	"github.com/spf13/cast"
 )
 
 type Context struct {
@@ -58,31 +59,27 @@ func (ctx *Context) GetRequest() *http.Request {
 	return ctx.request
 }
 
-func (ctx *Context) QueryInt(key string, def int) int {
+func (ctx *Context) QueryInt(key string, def int) (int, bool) {
 	hash := ctx.QueryAll()
 	vals, ok := hash[key]
 	if ok {
 		if len(vals) > 0 {
-			intval, err := strconv.Atoi(vals[len(vals)-1])
-			if err != nil {
-				return def
-			}
-			return intval
+			return cast.ToInt(vals[len(vals)-1]), true
 		}
 	}
 
-	return def
+	return def, false
 }
 
-func (ctx *Context) QueryString(key string, def string) string {
+func (ctx *Context) QueryString(key string, def string) (string, bool) {
 	hash := ctx.QueryAll()
 	vals, ok := hash[key]
 	if ok {
 		if len(vals) > 0 {
-			return vals[len(vals)-1]
+			return vals[len(vals)-1], true
 		}
 	}
-	return def
+	return def, false
 }
 
 func (ctx *Context) QueryAll() map[string][]string {
