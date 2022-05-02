@@ -4,6 +4,7 @@ package main
 import "webframework/framework"
 
 func registerRouter(core *framework.Core) {
+	core.Use()
 	core.Get("/user/login", UserLoginController)
 	//subjectApi := core.Group("/subject")
 	//{

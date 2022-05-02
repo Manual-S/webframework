@@ -12,6 +12,8 @@ type Context struct {
 	request        *http.Request
 	responseWriter http.ResponseWriter
 	ctx            context.Context
+	handlers       []ControllerHandler
+	index          int // 当前请求调用到调用链的那个节点
 }
 
 func NewContext(r *http.Request, w http.ResponseWriter) *Context {
@@ -19,6 +21,7 @@ func NewContext(r *http.Request, w http.ResponseWriter) *Context {
 		request:        r,
 		responseWriter: w,
 		ctx:            r.Context(),
+		index:          -1,
 	}
 }
 
@@ -50,6 +53,10 @@ func (ctx *Context) Value(key interface{}) interface{} {
 }
 
 // request
+
+func (ctx *Context) GetRequest() *http.Request {
+	return ctx.request
+}
 
 func (ctx *Context) QueryInt(key string, def int) int {
 	hash := ctx.QueryAll()
@@ -107,4 +114,21 @@ func (ctx *Context) HTML() error {
 
 func (ctx *Context) Text() error {
 	return nil
+}
+
+func (ctx *Context) Next() error {
+	ctx.index++
+	if ctx.index < len(ctx.handlers) {
+		// 有没有执行完的handler
+		err := ctx.handlers[ctx.index](ctx)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (ctx *Context) SetHandlers(handlers []ControllerHandler) {
+	ctx.handlers = handlers
 }

@@ -19,7 +19,7 @@ func NewTree() *Tree {
 type node struct {
 	isLast  bool
 	segment string
-	handler ControllerHandler
+	handler []ControllerHandler // 中间件+控制器
 	childs  []*node
 }
 
@@ -96,7 +96,7 @@ func (n *node) matchNode(uri string) *node {
 }
 
 // AddRouter 增加路由规则
-func (tree *Tree) AddRouter(uri string, handler ControllerHandler) error {
+func (tree *Tree) AddRouter(uri string, handler ...ControllerHandler) error {
 	n := tree.root
 	if n.matchNode(uri) != nil {
 		return errors.New("roter exist" + uri)
@@ -144,7 +144,7 @@ func (tree *Tree) AddRouter(uri string, handler ControllerHandler) error {
 }
 
 // FindHandler 匹配uri
-func (tree *Tree) FindHandler(uri string) ControllerHandler {
+func (tree *Tree) FindHandler(uri string) []ControllerHandler {
 
 	matchNode := tree.root.matchNode(uri)
 	if matchNode == nil {
