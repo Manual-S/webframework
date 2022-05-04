@@ -30,7 +30,7 @@ func FooControllerHandler(c *framework.Context) error {
 		}()
 
 		time.Sleep(10 * time.Second)
-		c.Json(http.StatusOK, "ok")
+		c.SetOkStatus()
 
 		finish <- struct{}{}
 	}()
@@ -41,13 +41,13 @@ func FooControllerHandler(c *framework.Context) error {
 		c.WriteMux().Lock()
 		defer c.WriteMux().Unlock()
 		log.Println(p)
-		c.Json(http.StatusInternalServerError, "panic")
+		c.SetStatus(http.StatusInternalServerError).Json("panic")
 	case <-finish:
 		fmt.Println("finish")
 	case <-durationCtx.Done():
 		c.WriteMux().Lock()
 		defer c.WriteMux().Unlock()
-		c.Json(http.StatusInternalServerError, "time out")
+		c.SetStatus(http.StatusInternalServerError).Json("time out")
 		c.SetHasTimeout()
 	}
 
@@ -62,7 +62,7 @@ type User struct {
 func UserLoginController(c *framework.Context) error {
 	user := User{}
 	c.BindJson(&user)
-	c.Json(http.StatusOK, user)
+	c.SetOkStatus().Json(user)
 	return nil
 }
 
@@ -71,13 +71,13 @@ func SubjectGetController(c *framework.Context) error {
 	hash := make(map[string]int)
 	id, _ := c.ParamInt("id", 0)
 	hash["id"] = id
-	c.Json(http.StatusOK, hash)
+	c.SetOkStatus().Json(hash)
 
 	return nil
 }
 
 func FooControllerHandler2(c *framework.Context) error {
 	time.Sleep(10 * time.Second)
-	c.Json(http.StatusOK, "ok")
+	c.SetOkStatus().Json("ok")
 	return nil
 }

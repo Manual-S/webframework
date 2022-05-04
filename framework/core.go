@@ -29,7 +29,7 @@ func (c *Core) ServeHTTP(response http.ResponseWriter, request *http.Request) {
 	// 寻找路由
 	router := c.FindRouteByRequest(request)
 	if router == nil {
-		ctx.Json(http.StatusNotFound, "not found")
+		ctx.SetOkStatus().Json("not found")
 		return
 	}
 
@@ -42,7 +42,7 @@ func (c *Core) ServeHTTP(response http.ResponseWriter, request *http.Request) {
 
 	err := ctx.Next()
 	if err != nil {
-		ctx.Json(http.StatusInternalServerError, "inner error")
+		ctx.SetStatus(http.StatusInternalServerError).Json("inner error")
 		return
 	}
 }

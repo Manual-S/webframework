@@ -268,28 +268,39 @@ func (ctx *Context) ClientIp() string {
 
 // response
 
-func (ctx *Context) Json(status int, data interface{}) error {
-	if ctx.HasTimeout() {
+func (ctx *Context) Json(obj interface{}) IResponse {
+	byt, err := json.Marshal(obj)
+	if err != nil {
 		return nil
 	}
-	ctx.responseWriter.Header().Set("Content-Type", "application/json")
-	ctx.responseWriter.WriteHeader(status)
-	byt, err := json.Marshal(data)
-	if err != nil {
-		ctx.responseWriter.WriteHeader(http.StatusInternalServerError)
-		return err
-	}
+	ctx.SetHeader("Content-Type", "application/json")
 	ctx.responseWriter.Write(byt)
 	return nil
 }
 
-func (ctx *Context) HTML() error {
+func (ctx *Context) SetHeader(key string, value string) IResponse {
+	ctx.responseWriter.Header().Set(key, value)
 	return nil
 }
 
-func (ctx *Context) Text() error {
+func (ctx *Context) SetCookie(key string, value string, maxAge int, path, domain string, secure, httpOnly bool) IResponse {
+	// todo
 	return nil
 }
+
+// SetStatus 设置状态码
+func (ctx *Context) SetStatus(code int) IResponse {
+	ctx.responseWriter.WriteHeader(code)
+	return ctx
+}
+
+// SetOkStatus 设置200状态
+func (ctx *Context) SetOkStatus() IResponse {
+	ctx.responseWriter.WriteHeader(http.StatusOK)
+	return ctx
+}
+
+//
 
 func (ctx *Context) Next() error {
 	ctx.index++

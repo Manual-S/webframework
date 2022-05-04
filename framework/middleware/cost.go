@@ -14,7 +14,7 @@ func Recovery() framework.ControllerHandler {
 	return func(c *framework.Context) error {
 		defer func() {
 			if err := recover(); err != nil {
-				c.Json(http.StatusInternalServerError, "err")
+				c.SetStatus(http.StatusInternalServerError).Json(err)
 			}
 		}()
 
@@ -69,13 +69,13 @@ func TimeHandler(fun framework.ControllerHandler, d time.Duration) framework.Con
 			c.WriteMux().Lock()
 			defer c.WriteMux().Unlock()
 			log.Println(p)
-			c.Json(http.StatusInternalServerError, "panic")
+			c.SetStatus(http.StatusInternalServerError).Json("panic")
 		case <-finish:
 			fmt.Println("finish")
 		case <-durationCtx.Done():
 			c.WriteMux().Lock()
 			defer c.WriteMux().Unlock()
-			c.Json(http.StatusInternalServerError, "time out")
+			c.SetStatus(http.StatusInternalServerError).Json("time out")
 			c.SetHasTimeout()
 		}
 
