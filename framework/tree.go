@@ -17,10 +17,10 @@ func NewTree() *Tree {
 }
 
 type node struct {
-	isLast  bool
-	segment string
+	isLast  bool                // 代表这个节点是否可以成为最终的路由规则
+	segment string              // uri中的字符串
 	handler []ControllerHandler // 中间件+控制器
-	childs  []*node
+	childs  []*node             // 子节点
 }
 
 func newNode() *node {
@@ -60,11 +60,13 @@ func (n *node) filterChildNodes(segment string) []*node {
 	return nodes
 }
 
+// matchNode 判断路由是否已经存在于当前的路由树中
 func (n *node) matchNode(uri string) *node {
 	segments := strings.SplitN(uri, "/", 2)
 	segment := segments[0]
 
 	if !isWildSegment(segment) {
+		// 把所有的uri改为大写
 		segment = strings.ToUpper(segment)
 	}
 
@@ -121,6 +123,12 @@ func (tree *Tree) AddRouter(uri string, handler ...ControllerHandler) error {
 
 		if len(childNodes) > 0 {
 			// 说明有匹配的子节点
+			for _, cnode := range childNodes {
+				if cnode.segment == segment {
+					objNode = cnode
+					break
+				}
+			}
 		}
 
 		if objNode == nil {
@@ -145,7 +153,6 @@ func (tree *Tree) AddRouter(uri string, handler ...ControllerHandler) error {
 
 // FindHandler 匹配uri
 func (tree *Tree) FindHandler(uri string) []ControllerHandler {
-
 	matchNode := tree.root.matchNode(uri)
 	if matchNode == nil {
 		return nil
