@@ -26,6 +26,7 @@ func NewCore() *Core {
 func (c *Core) ServeHTTP(response http.ResponseWriter, request *http.Request) {
 	ctx := NewContext(request, response)
 
+	// 寻找路由
 	router := c.FindRouteByRequest(request)
 	if router == nil {
 		ctx.Json(http.StatusNotFound, "not found")
@@ -33,7 +34,11 @@ func (c *Core) ServeHTTP(response http.ResponseWriter, request *http.Request) {
 	}
 
 	// 设置context中的handlers字段
-	ctx.SetHandlers(router)
+	ctx.SetHandlers(router.handler)
+
+	// 设置路由参数
+	params := router.parseParmsFromEndNode(request.URL.Path)
+	ctx.SetParams(params)
 
 	err := ctx.Next()
 	if err != nil {
@@ -55,12 +60,12 @@ func (c *Core) Post(url string, handler ControllerHandler) {
 
 }
 
-func (c *Core) FindRouteByRequest(req *http.Request) []ControllerHandler {
+func (c *Core) FindRouteByRequest(req *http.Request) *node {
 	uri := req.URL.Path
 	method := req.Method
 	upperMethod := strings.ToUpper(method)
 	if methodHandlers, ok := c.router[upperMethod]; ok {
-		return methodHandlers.FindHandler(uri)
+		return methodHandlers.root.matchNode(uri)
 	}
 	return nil
 }

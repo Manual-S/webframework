@@ -2,6 +2,7 @@ package framework
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -21,6 +22,7 @@ type node struct {
 	segment string              // uri中的字符串
 	handler []ControllerHandler // 中间件+控制器
 	childs  []*node             // 子节点
+	parent  *node               // 父节点
 }
 
 func newNode() *node {
@@ -60,7 +62,7 @@ func (n *node) filterChildNodes(segment string) []*node {
 	return nodes
 }
 
-// matchNode 判断路由是否已经存在于当前的路由树中
+// matchNode 找到当前路由匹配的节点
 func (n *node) matchNode(uri string) *node {
 	segments := strings.SplitN(uri, "/", 2)
 	segment := segments[0]
@@ -140,6 +142,8 @@ func (tree *Tree) AddRouter(uri string, handler ...ControllerHandler) error {
 				cnode.handler = handler
 			}
 
+			cnode.parent = n
+
 			n.childs = append(n.childs, cnode)
 
 			objNode = cnode
@@ -152,10 +156,35 @@ func (tree *Tree) AddRouter(uri string, handler ...ControllerHandler) error {
 }
 
 // FindHandler 匹配uri
-func (tree *Tree) FindHandler(uri string) []ControllerHandler {
+func (tree *Tree) FindHandler(uri string) *node {
 	matchNode := tree.root.matchNode(uri)
 	if matchNode == nil {
 		return nil
 	}
-	return matchNode.handler
+	return matchNode
+}
+
+// 将uri解析成params
+func (n *node) parseParmsFromEndNode(uri string) map[string]string {
+	ret := map[string]string{}
+
+	segment := strings.Split(uri, "/")
+
+	cnt := len(segment)
+	cur := n
+
+	for i := cnt - 1; i >= 0; i-- {
+		fmt.Printf("cur.segment = %v", cur.segment)
+		if cur.segment == "" {
+			break
+		}
+
+		if isWildSegment(cur.segment) {
+			// 说明是一个通配符
+			ret[cur.segment[1:]] = segment[i]
+		}
+		cur = cur.parent
+	}
+
+	return ret
 }

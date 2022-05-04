@@ -54,15 +54,25 @@ func FooControllerHandler(c *framework.Context) error {
 	return nil
 }
 
+type User struct {
+	UserName string `json:"user_name"`
+	Pasword  string `json:"pasword"`
+}
+
 func UserLoginController(c *framework.Context) error {
-	c.Json(http.StatusOK, "UserLoginController")
-	time.Sleep(1 * time.Microsecond)
+	user := User{}
+	c.BindJson(&user)
+	c.Json(http.StatusOK, user)
 	return nil
 }
 
 func SubjectGetController(c *framework.Context) error {
 	// 具体的业务逻辑
-	c.Json(http.StatusOK, "SubjectGetController")
+	hash := make(map[string]int)
+	id, _ := c.ParamInt("id", 0)
+	hash["id"] = id
+	c.Json(http.StatusOK, hash)
+
 	return nil
 }
 
