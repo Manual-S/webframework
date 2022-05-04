@@ -69,3 +69,7 @@ func (c *Core) FindRouteByRequest(req *http.Request) []ControllerHandler {
 func (c *Core) Use(middlewares ...ControllerHandler) {
 	c.middleswares = append(c.middleswares, middlewares...)
 }
+
+func (c *Core) Group(prefix string) IGroup {
+	return NewGroup(c, prefix)
+}

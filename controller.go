@@ -58,3 +58,9 @@ func UserLoginController(c *framework.Context) error {
 	time.Sleep(1 * time.Microsecond)
 	return nil
 }
+
+func SubjectGetController(c *framework.Context) error {
+	// 具体的业务逻辑
+	c.Json(http.StatusOK, "SubjectGetController")
+	return nil
+}
