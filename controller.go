@@ -1,4 +1,5 @@
 // 理解成server层
+// 当前框架的一些demo
 package main
 
 import (
@@ -62,5 +63,11 @@ func UserLoginController(c *framework.Context) error {
 func SubjectGetController(c *framework.Context) error {
 	// 具体的业务逻辑
 	c.Json(http.StatusOK, "SubjectGetController")
+	return nil
+}
+
+func FooControllerHandler2(c *framework.Context) error {
+	time.Sleep(10 * time.Second)
+	c.Json(http.StatusOK, "ok")
 	return nil
 }
