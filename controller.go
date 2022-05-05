@@ -68,10 +68,8 @@ func UserLoginController(c *framework.Context) error {
 
 func SubjectGetController(c *framework.Context) error {
 	// 具体的业务逻辑
-	hash := make(map[string]int)
-	id, _ := c.ParamInt("id", 0)
-	hash["id"] = id
-	c.SetOkStatus().Json(hash)
+	time.Sleep(5 * time.Second)
+	c.SetOkStatus()
 
 	return nil
 }
