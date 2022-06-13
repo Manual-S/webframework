@@ -70,7 +70,8 @@ func SubjectGetController(c *framework.Context) error {
 	// 具体的业务逻辑
 	time.Sleep(5 * time.Second)
 	c.SetOkStatus()
-
+	id, _ := c.QueryInt("id", -1)
+	fmt.Printf("id = %v\n", id)
 	return nil
 }
 
